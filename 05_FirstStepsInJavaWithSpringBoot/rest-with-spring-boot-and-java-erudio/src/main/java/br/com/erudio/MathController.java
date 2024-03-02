@@ -1,22 +1,38 @@
 package br.com.erudio;
 
-import java.util.concurrent.atomic.AtomicLong;
-
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-public class GreetingController {
+public class MathController {
 	
-	private static final String template = "Hello, %s!";
-	private static final AtomicLong counter = new AtomicLong();
-	
-	@GetMapping("/greeting")
-	public Greeting greeting(
-			@RequestParam(value = "name", defaultValue = "World")
-			String name) {
-		return new Greeting(counter.incrementAndGet(), String.format(template, name));
+	@GetMapping("/sum/{numberOne}/{numberTwo}")
+	public Double sum(
+		@PathVariable(value = "numberOne") String numberOne,
+		@PathVariable(value = "numberTwo") String numberTwo		
+		) throws Exception {
+
+		if(!isNumeric(numberOne) || !isNumeric(numberTwo)) { 
+			throw new Exception();
+		} 
+		return convertToDouble(numberOne) + convertToDouble(numberTwo);
+	}
+
+	private Double convertToDouble(String strNumber) {
+		if(strNumber == null) return 0D; // can launch an exception too
+		
+		String number = strNumber.replaceAll(",", "."); //replace all ',' to '.'
+		if(isNumeric(number)) return Double.parseDouble(number);
+		
+		return 0D;
+	}
+
+	private boolean isNumeric(String strNumber) {
+		if(strNumber == null) return false; // can launch an exception too
+		
+		String number = strNumber.replaceAll(",", "."); //replace all ',' to '.'
+		return number.matches("[-+]?[0-9]*\\.?[0-9]+"); // regex to verify if the parameter is a numeric
 	}
 	
 }
